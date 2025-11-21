@@ -6,7 +6,7 @@ This project implements a comprehensive IoT simulation platform running entirely
 
 ### System Components
 
-![IoT Architecture Diagram](./images/iot_architecture.png
+![IoT Architecture Diagram](./images/iot_architecture.png)
 
 #### Architecture Layers
 
@@ -210,19 +210,16 @@ You should see real-time sensor data and actuator controls.
 
 ### Step 2: Configure Node-RED for Cloud Connection
 
-#### 2.1 Generate and Configure SSH Keys (if using MQTTS)
+#### 2.1 Download and Import ThingsBoard Public Key (if using MQTTS)
 
-1. Generate SSH key pair:
+1. Download the ThingsBoard public key from their official documentation or website.
+
+2. Import the **public key** into the Node-RED config volume:
 ```powershell
-ssh-keygen -t rsa -b 4096 -f nodered_key
+copy thingsboard_public_key.pem nodered_data/
 ```
 
-2. Copy the **public key** to Node-RED config volume:
-```powershell
-copy nodered_key.pub nodered_data/config/
-```
-
-3. Configure ThingsBoard to accept this public key (in device credentials)
+3. Configure Node-RED to use this public key for secure communication with ThingsBoard.
 
 #### 2.2 Import Cloud Dashboard
 
@@ -288,35 +285,7 @@ Node-RED acts as the **bridge**, subscribing to local topics and republishing to
 }
 ```
 
-**Trigger Alarm:**
-```json
-{
-  "command": "TRIGGER",
-  "message": "Fire detected in Zone A!"
-}
-```
 
----
-
-## 🛠️ Testing & Debugging
-
-### View Simulator Logs
-```powershell
-docker logs -f simulator_container_iot
-```
-
-### Access Mosquitto Logs
-```powershell
-docker logs -f mosquitto_container_iot
-```
-
-### Test MQTT Communication
-Install MQTT client (e.g., MQTTX or mosquitto_pub/sub) and subscribe:
-```powershell
-docker exec -it mosquitto_container_iot mosquitto_sub -h localhost -t "home/#" -v
-```
-
----
 
 ## 🔒 Security Enhancements
 
@@ -359,43 +328,7 @@ docker compose restart mosquitto
 
 ---
 
-## 🧪 Development & Customization
 
-### Adding New Sensors
-
-1. Create new Python script in `simulator/Sensors/`
-2. Follow the pattern in existing sensor files
-3. Update `.env` with new topic
-4. Add to `start.sh`
-5. Rebuild simulator image
-
-### Modifying Sensor Intervals
-
-Edit the `await asyncio.sleep(X)` value in sensor Python files.
-
-### Custom Node-RED Flows
-
-Edit flows directly in Node-RED UI at `http://localhost:1880` and deploy changes. Flows are persisted in `nodered_data/flows.json`.
-
----
-
-## 🐛 Troubleshooting
-
-### Simulator Container Exits
-- Check logs: `docker logs simulator_container_iot`
-- Verify `.env` file exists
-- Ensure mosquitto is running first
-
-### Can't Connect to Mosquitto
-- Verify hostname: `docker exec simulator_container_iot ping mosquitto`
-- Check if containers are on same network: `docker network inspect iot`
-
-### Node-RED Dashboard Not Loading
-- Clear browser cache
-- Verify dashboard nodes are installed
-- Check Node-RED logs: `docker logs nodered_container_iot`
-
----
 
 ## 📚 Additional Resources
 
